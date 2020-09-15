@@ -1,0 +1,139 @@
+<html>
+
+<head>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+
+    <title>Chart</title>
+</head>
+
+<body>
+    <canvas id='myChart'></canvas>
+    
+    <script>
+        curve1 = {
+            mean: 0,
+            stdev: 1
+        }
+        curve2 = {
+            mean: 2,
+            stdev: 1,
+        }
+        curveIncrements = 0.5
+
+        function calcGaus(mean, stdev, x) {
+            var part1 = 1 / (stdev * Math.sqrt(2 * Math.PI))
+            var part2 = Math.exp(-1 * (Math.pow(x - mean, 2) / (2 * Math.pow(stdev, 2))))
+            return (part1 * part2)
+        }
+
+        function createGausDataset(mean, stdev, numdev, inc) {
+            var dataset = []
+            for (i = (numdev * -1); i < (numdev + inc); i += inc) {
+                var xy = {}
+                x = i * stdev + mean
+                y = calcGaus(mean, stdev, x)
+                xy = {
+                    x: x,
+                    y: y
+                }
+                dataset.push(xy)
+            }
+            return dataset
+        }
+
+        function createAlpha(mean, stdev, z) {
+            var dataset = []
+            for (i = 3; i > z; i -= 0.5) {
+                x = i * stdev + mean
+                y = calcGaus(mean, stdev, x)
+                xy = {
+                    x: x,
+                    y: y
+                }
+                dataset.push(xy)
+            }
+            dataset.push({
+                x: z * stdev + mean,
+                y: calcGaus(mean, stdev, z * stdev + mean)
+            })
+            return dataset
+        }
+
+        function createBeta(mean, stdev, z) {
+            var dataset = []
+            for (i = -3; i < z; i += 0.5) {
+                x = i * stdev + mean
+                y = calcGaus(mean, stdev, x)
+                xy = {
+                    x: x,
+                    y: y
+                }
+                dataset.push(xy)
+            }
+            dataset.push({
+                x: z * stdev + mean,
+                y: calcGaus(mean, stdev, z * stdev + mean)
+            })
+            return dataset
+        }
+
+        function createAB(commonX) {
+            alphaZ = (commonX - 0) / 1
+            betaZ = (commonX - 2) / 1
+            alpha = createAlpha(0, 1, alphaZ)
+            beta = createBeta(2, 1, betaZ)
+
+            chart.data.datasets.push({
+                backgroundColor: '#DE5D94',
+                label: 'alpha',
+                data: alpha,
+            })
+
+            chart.data.datasets.push({
+                backgroundColor: '#37C7C6',
+                label: 'beta',
+                data: beta
+            })
+
+            chart.update()
+
+        }
+
+        var myChart = document.getElementById('myChart').getContext('2d');
+
+        var chart = new Chart(myChart, {
+            type: 'line',
+            data: {
+                datasets: [{
+                    pointRadius: 3,
+                    fill: false,
+                    borderColor: '#ff6384',
+                    label: 'Curve 1',
+                    data: createGausDataset(0, 1, 3, 0.5)
+                },
+                {
+                    pointRadius: 3,
+                    fill: false,
+                    borderColor: '#1BBAC2',
+                    label: 'Curve 2',
+                    data: createGausDataset(2, 1, 3, 0.5)
+                },
+                ],
+            },
+            options: {
+                scales: {
+                    xAxes: [{ type: 'linear', position: 'bottom' }]
+                },
+                elements: {
+                    line: {
+                        borderWidth: 6,
+                    }
+                }
+            }
+        });
+
+        createAB(1.5)
+    </script>
+</body>
+
+</html>

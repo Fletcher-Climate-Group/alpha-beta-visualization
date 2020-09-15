@@ -1,0 +1,7 @@
+function gaus(mean, stdev, x){
+	var part1 = 1/(stdev*Math.sqrt(2*Math.PI))
+  var part2 = Math.exp(-1*(Math.pow(x-mean,2)/(2*Math.pow(stdev,2))))
+  console.log(part1*part2)
+}
+
+gaus(0,1,1)
