@@ -135,8 +135,8 @@ var chart = new Chart(myChart, {
 
 createAB(curve1.mean + curve1.stdev * 1.65)
 
-var slider = document.getElementById("myRange")
-var output = document.getElementById("demo")
+var slider = document.getElementById("alphaRange")
+var output = document.getElementById("alphaValue")
 output.innerHTML = slider.value
 
 slider.oninput = function () {
@@ -145,5 +145,5 @@ slider.oninput = function () {
     endPoint = curve1.mean + curve1.stdev * numStdev
     startPoint = curve1.mean + curve1.stdev * 1.65
 
-    createAB((this.value / 100) * (endPoint - startPoint) + startPoint)
+    createAB(endPoint - (this.value / 100) * (endPoint - startPoint))
 }
