@@ -9,14 +9,19 @@
 <body>
     <canvas id='myChart'></canvas>
 
+    <div class="slidecontainer">
+        <input type="range" min="1" max="100" value="0" class="slider" id="myRange">
+        <p>Value: <span id="demo"></span></p>
+    </div>
+
     <script>
-        //global variables
+        //variables for normal curves
         curve1 = {
             mean: 0,
             stdev: 1,
         }
         curve2 = {
-            mean: 3,
+            mean: 2,
             stdev: 1,
         }
         curveIncrement = 0.5
@@ -85,7 +90,7 @@
             betaZ = (commonX - curve2.mean) / curve2.stdev
             alpha = createAlpha(curve1.mean, curve1.stdev, alphaZ)
             beta = createBeta(curve2.mean, curve2.stdev, betaZ)
-            
+
             chart.data.datasets[2].data = alpha
             chart.data.datasets[3].data = beta
 
@@ -100,14 +105,14 @@
             data: {
                 datasets: [{
                     label: 'Curve 1',
-                    pointRadius: 3,
+                    pointRadius: 0,
                     fill: false,
                     borderColor: '#ff6384',
                     data: createGausDataset(curve1.mean, curve1.stdev, numStdev, curveIncrement)
                 },
                 {
                     label: 'Curve 2',
-                    pointRadius: 3,
+                    pointRadius: 0,
                     fill: false,
                     borderColor: '#1BBAC2',
                     data: createGausDataset(curve2.mean, curve2.stdev, numStdev, curveIncrement)
@@ -117,7 +122,7 @@
                     backgroundColor: '#DE5D94',
                     borderWidth: 0,
                     pointRadius: 0,
-                    
+
                 },
                 {
                     label: 'beta',
@@ -129,18 +134,35 @@
             },
             options: {
                 scales: {
-                    xAxes: [{ type: 'linear', position: 'bottom' }]
+                    xAxes: [{
+                        type: 'linear',
+                        position: 'bottom'
+                    }]
                 },
                 elements: {
                     line: {
-                        borderWidth: 6,
+                        borderWidth: 7,
                     }
                 }
             }
         });
 
-        createAB(2)
+        createAB(curve1.mean + curve1.stdev * 1.65)
+
+        var slider = document.getElementById("myRange")
+        var output = document.getElementById("demo")
+        output.innerHTML = slider.value
+
+        slider.oninput = function () {
+            output.innerHTML = this.value
+
+            endPoint = curve1.mean + curve1.stdev * numStdev
+            startPoint = curve1.mean + curve1.stdev * 1.65
+
+            createAB((this.value / 100) * (endPoint - startPoint) + startPoint)
+        }
     </script>
+
 </body>
 
 </html>
