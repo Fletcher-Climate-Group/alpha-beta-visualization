@@ -84,40 +84,46 @@ function createAB(commonX) {
     chart.update()
 }
 
+//chart canvas
 var myChart = document.getElementById('curveChart').getContext('2d');
 
+//chart setup
 var chart = new Chart(myChart, {
     type: 'line',
     data: {
-        datasets: [{
-            label: 'Curve 1',
-            pointRadius: 0,
-            fill: false,
-            borderColor: '#ff6384',
-            data: createGausDataset(curve1.mean, curve1.stdev, numStdev, curveIncrement)
-        },
-        {
-            label: 'Curve 2',
-            pointRadius: 0,
-            fill: false,
-            borderColor: '#1BBAC2',
-            data: createGausDataset(curve2.mean, curve2.stdev, numStdev, curveIncrement)
-        },
-        {
-            label: 'alpha',
-            borderColor: '#DE5D94',
-            backgroundColor: '#DE5D94',
-            borderWidth: 4,
-            pointRadius: 0,
-
-        },
-        {
-            label: 'beta',
-            borderColor: '#37C7C6',
-            backgroundColor: '#37C7C6',
-            borderWidth: 4,
-            pointRadius: 0,
-        },
+        datasets: [
+            //curve 1 for null mean
+            {
+                label: 'Curve 1',
+                pointRadius: 0,
+                fill: false,
+                borderColor: '#ff6384',
+                data: createGausDataset(curve1.mean, curve1.stdev, numStdev, curveIncrement)
+            },
+            //curve 2 for testing mean
+            {
+                label: 'Curve 2',
+                pointRadius: 0,
+                fill: false,
+                borderColor: '#1BBAC2',
+                data: createGausDataset(curve2.mean, curve2.stdev, numStdev, curveIncrement)
+            },
+            //alpha highlight initial setup
+            {
+                label: 'alpha',
+                borderColor: '#DE5D94',
+                backgroundColor: '#DE5D94',
+                borderWidth: 4,
+                pointRadius: 0,
+            },
+            //beta highlight initial setup
+            {
+                label: 'beta',
+                borderColor: '#37C7C6',
+                backgroundColor: '#37C7C6',
+                borderWidth: 4,
+                pointRadius: 0,
+            },
         ],
     },
     options: {
@@ -154,8 +160,10 @@ var chart = new Chart(myChart, {
     }
 });
 
+//creates the initial alpha and beta highlight
 createAB(curve1.mean + curve1.stdev * 1.65)
 
+//variables and function for slider 
 var slider = document.getElementById("alphaRange")
 var output = document.getElementById("alphaValue")
 output.innerHTML = slider.value
