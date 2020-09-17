@@ -72,14 +72,17 @@ function createBeta(mean, stdev, z) {
 }
 
 //createAB: updates the alpha and beta datasets on the chart
-function createAB(commonX) {
+function createAlphaBetaPower(commonX) {
     alphaZ = (commonX - curve1.mean) / curve1.stdev
     betaZ = (commonX - curve2.mean) / curve2.stdev
+
     alpha = createAlpha(curve1.mean, curve1.stdev, alphaZ)
     beta = createBeta(curve2.mean, curve2.stdev, betaZ)
+    power = createAlpha(curve2.mean, curve2.stdev, betaZ)
 
     chart.data.datasets[2].data = alpha
     chart.data.datasets[3].data = beta
+    chart.data.datasets[4].data = power
 
     chart.update()
 }
@@ -124,6 +127,14 @@ var chart = new Chart(myChart, {
                 borderWidth: 4,
                 pointRadius: 0,
             },
+            //power highlight initial setup
+            {
+                label: 'power',
+                borderColor: '#4f87db',
+                backgroundColor: '#4f87db',
+                borderWidth: 4,
+                pointRadius: 0,
+            },
         ],
     },
     options: {
@@ -161,7 +172,7 @@ var chart = new Chart(myChart, {
 });
 
 //creates the initial alpha and beta highlight
-createAB(curve1.mean + curve1.stdev * 1.65)
+createAlphaBetaPower(curve1.mean + curve1.stdev * 1.65)
 
 //variables and function for slider 
 var slider = document.getElementById("alphaRange")
@@ -174,5 +185,5 @@ slider.oninput = function () {
     endPoint = curve1.mean + curve1.stdev * numStdev
     startPoint = curve1.mean + curve1.stdev * 1.65
 
-    createAB(endPoint - (this.value / 100) * (endPoint - startPoint))
+    createAlphaBetaPower(endPoint - (this.value / 100) * (endPoint - startPoint))
 }
