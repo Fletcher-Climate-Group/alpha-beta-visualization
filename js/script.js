@@ -105,29 +105,50 @@ var chart = new Chart(myChart, {
         },
         {
             label: 'alpha',
+            borderColor: '#DE5D94',
             backgroundColor: '#DE5D94',
-            borderWidth: 0,
+            borderWidth: 4,
             pointRadius: 0,
 
         },
         {
             label: 'beta',
+            borderColor: '#37C7C6',
             backgroundColor: '#37C7C6',
-            borderWidth: 0,
+            borderWidth: 4,
             pointRadius: 0,
         },
         ],
     },
     options: {
+        title: {
+            text: 'Alpha and Beta',
+            display: false,
+
+        },
+        legend: {
+            position: 'bottom'
+        },
         scales: {
             xAxes: [{
                 type: 'linear',
-                position: 'bottom'
-            }]
+                position: 'bottom',
+                display: true,
+                ticks: {
+                    display: false,
+                }
+            }],
+            yAxes: [{
+                display: true,
+                ticks: {
+                    display: false,
+                    suggestedMax: 0.45,
+                }
+            }],
         },
         elements: {
             line: {
-                borderWidth: 7,
+                borderWidth: 5.5,
             }
         }
     }

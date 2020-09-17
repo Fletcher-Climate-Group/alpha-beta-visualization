@@ -17,10 +17,17 @@
         integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV"
         crossorigin="anonymous"></script>
 
+    <!--styles-->
+    <link rel="stylesheet" href="css/style.css">
+
     <title>Chart</title>
 </head>
 
 <body>
+    <div class="container text-center mt-3">
+        <h2>Alpha and Beta</h2>
+    </div>
+
     <div class="container">
         <div class="row text-center">
             <div class="col">
@@ -33,7 +40,9 @@
         <div class="row text-center">
             <div class="col">
                 <div class="slidecontainer">
-                    <input type="range" min="1" max="100" value="100" class="slider" id="alphaRange">
+                    <span class="value left">-</span>
+                    <input type="range" min="0" max="100" value="100" class="slider" id="alphaRange">
+                    <span class="value right">+</span>
                     <p>Alpha: <span id="alphaValue"></span></p>
                 </div>
             </div>
