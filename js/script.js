@@ -33,6 +33,19 @@ function createGausDataset(mean, stdev, numdev, inc) {
     return dataset
 }
 
+function updateNormalCurves(mean1, mean2, stdev) {
+    curve1.mean = mean1
+    curve1.stdev = stdev
+    curve2.mean = mean2
+    curve2.stdev = stdev
+    var c1 = createGausDataset(mean1, stdev, numStdev, curveIncrement)
+    var c2 = createGausDataset(mean2, stdev, numStdev, curveIncrement)
+
+    chart.data.datasets[0].data = c1
+    chart.data.datasets[1].data = c2
+    chart.update()
+}
+
 //createAlpha: creates an alpha dataset to be added to the chart
 function createAlpha(mean, stdev, z) {
     var dataset = []
@@ -72,9 +85,23 @@ function createBeta(mean, stdev, z) {
 }
 
 //createAB: updates the alpha and beta datasets on the chart
-function createAlphaBetaPower(commonX) {
-    alphaZ = (commonX - curve1.mean) / curve1.stdev
-    betaZ = (commonX - curve2.mean) / curve2.stdev
+function updateAlphaBetaPower(alpha) {
+    var z_lookup = {
+        0.1: 1.28,
+        0.09: 1.34,
+        0.08: 1.41,
+        0.07: 1.48,
+        0.06: 1.55,
+        0.05: 1.64,
+        0.04: 1.75,
+        0.03: 1.88,
+        0.02: 2.05,
+        0.01: 2.33,
+        0: 3
+    }
+
+    alphaZ = z_lookup[alpha]
+    betaZ = ((alphaZ * curve1.stdev + curve1.mean) - curve2.mean) / curve2.stdev
 
     alpha = createAlpha(curve1.mean, curve1.stdev, alphaZ)
     beta = createBeta(curve2.mean, curve2.stdev, betaZ)
@@ -98,7 +125,7 @@ var chart = new Chart(myChart, {
             //curve 1 for null mean
             {
                 label: 'Curve 1',
-                pointRadius: 0,
+                pointRadius: 3,
                 fill: false,
                 borderColor: '#ff6384',
                 data: createGausDataset(curve1.mean, curve1.stdev, numStdev, curveIncrement)
@@ -106,7 +133,7 @@ var chart = new Chart(myChart, {
             //curve 2 for testing mean
             {
                 label: 'Curve 2',
-                pointRadius: 0,
+                pointRadius: 3,
                 fill: false,
                 borderColor: '#1BBAC2',
                 data: createGausDataset(curve2.mean, curve2.stdev, numStdev, curveIncrement)
@@ -139,12 +166,20 @@ var chart = new Chart(myChart, {
     },
     options: {
         title: {
-            text: 'Alpha and Beta',
+            text: 'Alpha, Beta and Power',
             display: false,
-
         },
         legend: {
-            position: 'bottom'
+            position: 'bottom',
+            labels: {
+                filter: function (item, chart) {
+                    removeList = ['Curve 1', 'Curve 2']
+                    if (removeList.includes(item.text)) {
+                        return false
+                    }
+                    return true
+                }
+            }
         },
         scales: {
             xAxes: [{
@@ -152,7 +187,7 @@ var chart = new Chart(myChart, {
                 position: 'bottom',
                 display: true,
                 ticks: {
-                    display: false,
+                    display: true,
                 }
             }],
             yAxes: [{
@@ -172,18 +207,38 @@ var chart = new Chart(myChart, {
 });
 
 //creates the initial alpha and beta highlight
-createAlphaBetaPower(curve1.mean + curve1.stdev * 1.65)
+updateAlphaBetaPower(0.1)
 
-//variables and function for slider 
-var slider = document.getElementById("alphaRange")
-var output = document.getElementById("alphaValue")
-output.innerHTML = slider.value
+//alpha slider 
+var sliderAlpha = document.getElementById("rangeAlpha")
+var outputAlpha = document.getElementById("valueAlpha")
+outputAlpha.innerHTML = sliderAlpha.value
 
-slider.oninput = function () {
-    output.innerHTML = this.value
-
-    endPoint = curve1.mean + curve1.stdev * numStdev
-    startPoint = curve1.mean + curve1.stdev * 1.65
-
-    createAlphaBetaPower(endPoint - (this.value / 100) * (endPoint - startPoint))
+sliderAlpha.oninput = function () {
+    outputAlpha.innerHTML = this.value
+    updateAlphaBetaPower(parseFloat(this.value))
 }
+
+//sample size slider 
+var sliderSampleSize = document.getElementById("rangeSampleSize")
+var outputSampleSize = document.getElementById("valueSampleSize")
+outputSampleSize.innerHTML = sliderSampleSize.value
+
+sliderSampleSize.oninput = function () {
+    outputSampleSize.innerHTML = this.value
+    stdev = Math.sqrt(100 / parseInt(this.value))
+    updateNormalCurves(curve1.mean, curve2.mean, stdev)
+    updateAlphaBetaPower(sliderAlpha.value)
+}
+
+//effect size slider 
+var sliderEffectSize = document.getElementById("rangeEffectSize")
+var outputEffectSize = document.getElementById("valueEffectSize")
+outputEffectSize.innerHTML = sliderEffectSize.value
+
+sliderEffectSize.oninput = function () {
+    outputEffectSize.innerHTML = this.value
+    updateNormalCurves(curve1.mean, parseFloat(this.value), curve1.stdev)
+    updateAlphaBetaPower(sliderAlpha.value)
+}
+

@@ -36,3 +36,8 @@
     background: #0d6cb9;
     cursor: pointer; /* Cursor on hover */
 }
+
+.value{
+    font-size: 18px;
+    font-weight: bold;
+}
