@@ -5,3 +5,7 @@ function gaus(mean, stdev, x){
 }
 
 gaus(0,1,1)
+
+ 
+ use jStat to calculate p values
+ <script src="https://cdn.jsdelivr.net/npm/jstat@latest/dist/jstat.min.js"></script>
