@@ -114,6 +114,12 @@ function updateAlphaBetaPower(alpha) {
     chart.update()
 }
 
+function getCommonX() {
+    x = chart.data.datasets[2].data[len = chart.data.datasets[2].data.length - 1].x
+    console.log(x)
+    return x
+}
+
 //chart canvas
 var myChart = document.getElementById('curveChart').getContext('2d');
 
@@ -209,13 +215,20 @@ var chart = new Chart(myChart, {
 //creates the initial alpha and beta highlight
 updateAlphaBetaPower(0.1)
 
-//alpha slider 
+//alpha slider and values for beta and power (note put updating beta and alpha numbers in a common function problably the updateAlphaBetaPower function)
 var sliderAlpha = document.getElementById("rangeAlpha")
 var outputAlpha = document.getElementById("valueAlpha")
+var outputBeta = document.getElementById("valueBeta")
+var outputPower = document.getElementById("valuePower")
 outputAlpha.innerHTML = sliderAlpha.value
+outputBeta.innerHTML = jStat.ztest(getCommonX(), curve2.mean, curve2.stdev, 1).toFixed(2)
+outputPower.innerHTML = 1 - jStat.ztest(getCommonX(), curve2.mean, curve2.stdev, 1).toFixed(2)
 
 sliderAlpha.oninput = function () {
     outputAlpha.innerHTML = this.value
+    outputBeta.innerHTML = jStat.ztest(getCommonX(), curve2.mean, curve2.stdev, 1).toFixed(2)
+    outputPower.innerHTML = 1 - jStat.ztest(getCommonX(), curve2.mean, curve2.stdev, 1).toFixed(2)
+    
     updateAlphaBetaPower(parseFloat(this.value))
 }
 
@@ -226,6 +239,9 @@ outputSampleSize.innerHTML = sliderSampleSize.value
 
 sliderSampleSize.oninput = function () {
     outputSampleSize.innerHTML = this.value
+    outputBeta.innerHTML = jStat.ztest(getCommonX(), curve2.mean, curve2.stdev, 1).toFixed(2)
+    outputPower.innerHTML = 1 - jStat.ztest(getCommonX(), curve2.mean, curve2.stdev, 1).toFixed(2)
+
     stdev = Math.sqrt(100 / parseInt(this.value))
     updateNormalCurves(curve1.mean, curve2.mean, stdev)
     updateAlphaBetaPower(sliderAlpha.value)
@@ -238,6 +254,9 @@ outputEffectSize.innerHTML = sliderEffectSize.value
 
 sliderEffectSize.oninput = function () {
     outputEffectSize.innerHTML = this.value
+    outputBeta.innerHTML = jStat.ztest(getCommonX(), curve2.mean, curve2.stdev, 1).toFixed(2)
+    outputPower.innerHTML = 1 - jStat.ztest(getCommonX(), curve2.mean, curve2.stdev, 1).toFixed(2)
+
     updateNormalCurves(curve1.mean, parseFloat(this.value), curve1.stdev)
     updateAlphaBetaPower(sliderAlpha.value)
 }
