@@ -33,11 +33,13 @@ function createGausDataset(mean, stdev, numdev, inc) {
     return dataset
 }
 
+//updateNormalCurves updates the normal curves in the chart mean and/or stdev changes
 function updateNormalCurves(mean1, mean2, stdev) {
     curve1.mean = mean1
     curve1.stdev = stdev
     curve2.mean = mean2
     curve2.stdev = stdev
+
     var c1 = createGausDataset(mean1, stdev, numStdev, curveIncrement)
     var c2 = createGausDataset(mean2, stdev, numStdev, curveIncrement)
 
@@ -84,7 +86,7 @@ function createBeta(mean, stdev, z) {
     return dataset
 }
 
-//createAB: updates the alpha and beta datasets on the chart
+//createAB: updates the alpha and beta datasets on the chart based on a new alpha for curve 1
 function updateAlphaBetaPower(alpha) {
     var z_lookup = {
         0.1: 1.28,
@@ -114,6 +116,7 @@ function updateAlphaBetaPower(alpha) {
     chart.update()
 }
 
+//displayAlphaBetaPower updates the alpha, beta, and power numbers displayed
 function displayAlphaBetaPower(){
     dAlpha = document.getElementById("displayAlpha")
     dBeta = document.getElementById("displayBeta")
@@ -126,8 +129,14 @@ function displayAlphaBetaPower(){
     power = (1-beta).toFixed(2)
 
     dAlpha.innerHTML = alpha
-    dBeta.innerHTML = beta
-    dPower.innerHTML = power
+
+    if (commonX <= curve2.mean){
+        dBeta.innerHTML = beta
+        dPower.innerHTML = power
+    } else {
+        dBeta.innerHTML = power
+        dPower.innerHTML = beta
+    }
 }
 
 //chart canvas
@@ -204,12 +213,14 @@ var chart = new Chart(myChart, {
                 display: true,
                 ticks: {
                     display: true,
+                    //suggestedMin: -6,
+                    //suggestedMax: 6,
                 }
             }],
             yAxes: [{
                 display: true,
                 ticks: {
-                    display: false,
+                    display: true,
                     suggestedMax: 0.45,
                 }
             }],
@@ -218,51 +229,57 @@ var chart = new Chart(myChart, {
             line: {
                 borderWidth: 5.5,
             }
-        }
+        },
+        animation: {
+            duration: 300
+        },
     }
 });
 
-//creates the initial alpha and beta highlight
+//create the initial alpha, beta, and power highlights and displays their initial values
 updateAlphaBetaPower(0.1)
 displayAlphaBetaPower()
 
-
-//alpha slider and values for beta and power (note put updating beta and alpha numbers in a common function problably the updateAlphaBetaPower function)
+//initial setup for alpha slider
 var sliderAlpha = document.getElementById("rangeAlpha")
 var outputAlpha = document.getElementById("valueAlpha")
 outputAlpha.innerHTML = sliderAlpha.value
 
+//alpha slider function: updates alpha, beta, and power based on the slider value
 sliderAlpha.oninput = function () {
     outputAlpha.innerHTML = this.value
-    displayAlphaBetaPower()
     
     updateAlphaBetaPower(parseFloat(this.value))
+    displayAlphaBetaPower()
 }
 
-//sample size slider 
+//initial setup for sample size slider 
 var sliderSampleSize = document.getElementById("rangeSampleSize")
 var outputSampleSize = document.getElementById("valueSampleSize")
 outputSampleSize.innerHTML = sliderSampleSize.value
 
+//sample size slider function: updates the normal curves, alpha, beta, and power based on the sample size from the slider
 sliderSampleSize.oninput = function () {
     outputSampleSize.innerHTML = this.value
-    displayAlphaBetaPower()
 
     stdev = Math.sqrt(100 / parseInt(this.value))
     updateNormalCurves(curve1.mean, curve2.mean, stdev)
+    
     updateAlphaBetaPower(sliderAlpha.value)
+    displayAlphaBetaPower()
 }
 
-//effect size slider 
+//initial setup for effect size slider 
 var sliderEffectSize = document.getElementById("rangeEffectSize")
 var outputEffectSize = document.getElementById("valueEffectSize")
 outputEffectSize.innerHTML = sliderEffectSize.value
 
+//effect size slider function: updates the normal curves, alpha, beta, and power based on the effect size from the slider
 sliderEffectSize.oninput = function () {
     outputEffectSize.innerHTML = this.value
-    displayAlphaBetaPower()
 
     updateNormalCurves(curve1.mean, parseFloat(this.value), curve1.stdev)
+    
     updateAlphaBetaPower(sliderAlpha.value)
+    displayAlphaBetaPower()
 }
-
