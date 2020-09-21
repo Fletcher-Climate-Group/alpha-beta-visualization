@@ -48,10 +48,10 @@ function updateNormalCurves(mean1, mean2, stdev) {
     chart.update()
 }
 
-//createAlpha: creates an alpha dataset to be added to the chart
-function createAlpha(mean, stdev, z) {
+//createRight: creates a right hand tail dataset
+function createRight(z, mean, stdev, numdev, inc) {
     var dataset = []
-    for (i = numStdev; i > z; i -= curveIncrement) {
+    for (i = numdev; i > z; i -= inc) {
         x = i * stdev + mean
         y = calcGaus(mean, stdev, x)
         xy = {
@@ -67,10 +67,10 @@ function createAlpha(mean, stdev, z) {
     return dataset
 }
 
-//createAlpha: creates a beta dataset to be added to the chart
-function createBeta(mean, stdev, z) {
+//createLeft: creates a left hand tail dataset
+function createLeft(z, mean, stdev, numdev, inc) {
     var dataset = []
-    for (i = (numStdev * -1); i < z; i += curveIncrement) {
+    for (i = (numdev * -1); i < z; i += inc) {
         x = i * stdev + mean
         y = calcGaus(mean, stdev, x)
         xy = {
@@ -105,9 +105,9 @@ function updateAlphaBetaPower(alpha) {
     alphaZ = z_lookup[alpha]
     betaZ = ((alphaZ * curve1.stdev + curve1.mean) - curve2.mean) / curve2.stdev
 
-    alpha = createAlpha(curve1.mean, curve1.stdev, alphaZ)
-    beta = createBeta(curve2.mean, curve2.stdev, betaZ)
-    power = createAlpha(curve2.mean, curve2.stdev, betaZ)
+    alpha = createRight(alphaZ, curve1.mean, curve1.stdev, numStdev, curveIncrement)
+    beta = createLeft(betaZ, curve2.mean, curve2.stdev, numStdev, curveIncrement)
+    power = createRight(betaZ, curve2.mean, curve2.stdev, numStdev, curveIncrement)
 
     chart.data.datasets[2].data = alpha
     chart.data.datasets[3].data = beta
@@ -150,7 +150,7 @@ var chart = new Chart(myChart, {
             //curve 1 for null mean
             {
                 label: 'Curve 1',
-                pointRadius: 3,
+                pointRadius: 0,
                 fill: false,
                 borderColor: '#ff6384',
                 data: createGausDataset(curve1.mean, curve1.stdev, numStdev, curveIncrement)
@@ -158,7 +158,7 @@ var chart = new Chart(myChart, {
             //curve 2 for testing mean
             {
                 label: 'Curve 2',
-                pointRadius: 3,
+                pointRadius: 0,
                 fill: false,
                 borderColor: '#1BBAC2',
                 data: createGausDataset(curve2.mean, curve2.stdev, numStdev, curveIncrement)
