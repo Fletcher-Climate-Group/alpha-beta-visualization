@@ -117,7 +117,7 @@ function updateAlphaBetaPower(alpha) {
 }
 
 //displayAlphaBetaPower updates the alpha, beta, and power numbers displayed
-function displayAlphaBetaPower(){
+function displayAlphaBetaPower() {
     dAlpha = document.getElementById("displayAlpha")
     dBeta = document.getElementById("displayBeta")
     dPower = document.getElementById("displayPower")
@@ -126,11 +126,11 @@ function displayAlphaBetaPower(){
 
     alpha = jStat.ztest(commonX, curve1.mean, curve1.stdev, 1).toFixed(2)
     beta = jStat.ztest(commonX, curve2.mean, curve2.stdev, 1).toFixed(2)
-    power = (1-beta).toFixed(2)
+    power = (1 - beta).toFixed(2)
 
     dAlpha.innerHTML = alpha
 
-    if (commonX <= curve2.mean){
+    if (commonX <= curve2.mean) {
         dBeta.innerHTML = beta
         dPower.innerHTML = power
     } else {
@@ -248,7 +248,7 @@ outputAlpha.innerHTML = sliderAlpha.value
 //alpha slider function: updates alpha, beta, and power based on the slider value
 sliderAlpha.oninput = function () {
     outputAlpha.innerHTML = this.value
-    
+
     updateAlphaBetaPower(parseFloat(this.value))
     displayAlphaBetaPower()
 }
@@ -264,7 +264,7 @@ sliderSampleSize.oninput = function () {
 
     stdev = Math.sqrt(100 / parseInt(this.value))
     updateNormalCurves(curve1.mean, curve2.mean, stdev)
-    
+
     updateAlphaBetaPower(sliderAlpha.value)
     displayAlphaBetaPower()
 }
@@ -279,7 +279,7 @@ sliderEffectSize.oninput = function () {
     outputEffectSize.innerHTML = this.value
 
     updateNormalCurves(curve1.mean, parseFloat(this.value), curve1.stdev)
-    
+
     updateAlphaBetaPower(sliderAlpha.value)
     displayAlphaBetaPower()
 }
