@@ -1,3 +1,3 @@
 # alpha-beta-visualization
-big meme
-ya yeet
+
+Visualizes the relationship between alpha, beta, and power
