@@ -10,135 +10,6 @@ curve2 = {
 curveIncrement = 0.5
 numStdev = 3
 
-//calcGaus: calculates the y value of a x based on the gausian fucntion
-function calcGaus(mean, stdev, x) {
-    var part1 = 1 / (stdev * Math.sqrt(2 * Math.PI))
-    var part2 = Math.exp(-1 * (Math.pow(x - mean, 2) / (2 * Math.pow(stdev, 2))))
-    return (part1 * part2)
-}
-
-//createGausDataset: creates a normal curve dataset to be added to the chart
-function createGausDataset(mean, stdev, numdev, inc) {
-    var dataset = []
-    for (i = (numdev * -1); i < (numdev + inc); i += inc) {
-        var xy = {}
-        x = i * stdev + mean
-        y = calcGaus(mean, stdev, x)
-        xy = {
-            x: x,
-            y: y
-        }
-        dataset.push(xy)
-    }
-    return dataset
-}
-
-//updateNormalCurves updates the normal curves in the chart mean and/or stdev changes
-function updateNormalCurves(mean1, mean2, stdev) {
-    curve1.mean = mean1
-    curve1.stdev = stdev
-    curve2.mean = mean2
-    curve2.stdev = stdev
-
-    var c1 = createGausDataset(mean1, stdev, numStdev, curveIncrement)
-    var c2 = createGausDataset(mean2, stdev, numStdev, curveIncrement)
-
-    chart.data.datasets[0].data = c1
-    chart.data.datasets[1].data = c2
-    chart.update()
-}
-
-//createRight: creates a right hand tail dataset
-function createRight(z, mean, stdev, numdev, inc) {
-    var dataset = []
-    for (i = numdev; i > z; i -= inc) {
-        x = i * stdev + mean
-        y = calcGaus(mean, stdev, x)
-        xy = {
-            x: x,
-            y: y
-        }
-        dataset.push(xy)
-    }
-    dataset.push({
-        x: z * stdev + mean,
-        y: calcGaus(mean, stdev, z * stdev + mean)
-    })
-    return dataset
-}
-
-//createLeft: creates a left hand tail dataset
-function createLeft(z, mean, stdev, numdev, inc) {
-    var dataset = []
-    for (i = (numdev * -1); i < z; i += inc) {
-        x = i * stdev + mean
-        y = calcGaus(mean, stdev, x)
-        xy = {
-            x: x,
-            y: y
-        }
-        dataset.push(xy)
-    }
-    dataset.push({
-        x: z * stdev + mean,
-        y: calcGaus(mean, stdev, z * stdev + mean)
-    })
-    return dataset
-}
-
-//createAB: updates the alpha and beta datasets on the chart based on a new alpha for curve 1
-function updateAlphaBetaPower(alpha) {
-    var z_lookup = {
-        0.1: 1.28,
-        0.09: 1.34,
-        0.08: 1.41,
-        0.07: 1.48,
-        0.06: 1.55,
-        0.05: 1.64,
-        0.04: 1.75,
-        0.03: 1.88,
-        0.02: 2.05,
-        0.01: 2.33,
-        0: 3
-    }
-
-    alphaZ = z_lookup[alpha]
-    betaZ = ((alphaZ * curve1.stdev + curve1.mean) - curve2.mean) / curve2.stdev
-
-    alpha = createRight(alphaZ, curve1.mean, curve1.stdev, numStdev, curveIncrement)
-    beta = createLeft(betaZ, curve2.mean, curve2.stdev, numStdev, curveIncrement)
-    power = createRight(betaZ, curve2.mean, curve2.stdev, numStdev, curveIncrement)
-
-    chart.data.datasets[2].data = alpha
-    chart.data.datasets[3].data = beta
-    chart.data.datasets[4].data = power
-
-    chart.update()
-}
-
-//displayAlphaBetaPower updates the alpha, beta, and power numbers displayed
-function displayAlphaBetaPower() {
-    dAlpha = document.getElementById("displayAlpha")
-    dBeta = document.getElementById("displayBeta")
-    dPower = document.getElementById("displayPower")
-
-    commonX = chart.data.datasets[2].data[len = chart.data.datasets[2].data.length - 1].x
-
-    alpha = jStat.ztest(commonX, curve1.mean, curve1.stdev, 1).toFixed(2)
-    beta = jStat.ztest(commonX, curve2.mean, curve2.stdev, 1).toFixed(2)
-    power = (1 - beta).toFixed(2)
-
-    dAlpha.innerHTML = alpha
-
-    if (commonX <= curve2.mean) {
-        dBeta.innerHTML = beta
-        dPower.innerHTML = power
-    } else {
-        dBeta.innerHTML = power
-        dPower.innerHTML = beta
-    }
-}
-
 //chart canvas
 var myChart = document.getElementById('curveChart').getContext('2d');
 
@@ -235,6 +106,121 @@ var chart = new Chart(myChart, {
         },
     }
 });
+
+//calcGaus: calculates the y value of a x based on the gausian fucntion
+function calcGaus(mean, stdev, x) {
+    var part1 = 1 / (stdev * Math.sqrt(2 * Math.PI))
+    var part2 = Math.exp(-1 * (Math.pow(x - mean, 2) / (2 * Math.pow(stdev, 2))))
+    return (part1 * part2)
+}
+
+//createGausDataset: creates a normal curve dataset to be added to the chart
+function createGausDataset(mean, stdev, numdev, inc) {
+    var dataset = []
+    for (i = (numdev * -1); i < (numdev + inc); i += inc) {
+        var xy = {}
+        x = i * stdev + mean
+        y = jStat.normal.pdf(x, mean, stdev)
+        xy = {
+            x: x,
+            y: y
+        }
+        dataset.push(xy)
+    }
+    return dataset
+}
+
+//updateNormalCurves updates the normal curves in the chart mean and/or stdev changes
+function updateNormalCurves(mean1, mean2, stdev) {
+    curve1.mean = mean1
+    curve1.stdev = stdev
+    curve2.mean = mean2
+    curve2.stdev = stdev
+
+    var c1 = createGausDataset(mean1, stdev, numStdev, curveIncrement)
+    var c2 = createGausDataset(mean2, stdev, numStdev, curveIncrement)
+
+    chart.data.datasets[0].data = c1
+    chart.data.datasets[1].data = c2
+    chart.update()
+}
+
+//createRight: creates a right hand tail dataset
+function createRight(z, mean, stdev, numdev, inc) {
+    var dataset = []
+    for (i = numdev; i > z; i -= inc) {
+        x = i * stdev + mean
+        y = jStat.normal.pdf(x, mean, stdev)
+        xy = {
+            x: x,
+            y: y
+        }
+        dataset.push(xy)
+    }
+    dataset.push({
+        x: z * stdev + mean,
+        y: jStat.normal.pdf(z * stdev + mean, mean, stdev)
+    })
+    return dataset
+}
+
+//createLeft: creates a left hand tail dataset
+function createLeft(z, mean, stdev, numdev, inc) {
+    var dataset = []
+    for (i = (numdev * -1); i < z; i += inc) {
+        x = i * stdev + mean
+        y = jStat.normal.pdf(x, mean, stdev)
+        xy = {
+            x: x,
+            y: y
+        }
+        dataset.push(xy)
+    }
+    dataset.push({
+        x: z * stdev + mean,
+        y: jStat.normal.pdf(z * stdev + mean, mean, stdev)
+    })
+    return dataset
+}
+
+//createAB: updates the alpha and beta datasets on the chart based on a new alpha for curve 1
+function updateAlphaBetaPower(alpha) {
+    alphaZ = (jStat.normal.inv(alpha, curve1.mean, curve1.stdev)*-1 - curve1.mean)/curve1.stdev
+    betaZ = ((alphaZ * curve1.stdev + curve1.mean) - curve2.mean) / curve2.stdev
+
+    alpha = createRight(alphaZ, curve1.mean, curve1.stdev, numStdev, curveIncrement)
+    beta = createLeft(betaZ, curve2.mean, curve2.stdev, numStdev, curveIncrement)
+    power = createRight(betaZ, curve2.mean, curve2.stdev, numStdev, curveIncrement)
+
+    chart.data.datasets[2].data = alpha
+    chart.data.datasets[3].data = beta
+    chart.data.datasets[4].data = power
+
+    chart.update()
+}
+
+//displayAlphaBetaPower updates the alpha, beta, and power numbers displayed
+function displayAlphaBetaPower() {
+    dAlpha = document.getElementById("displayAlpha")
+    dBeta = document.getElementById("displayBeta")
+    dPower = document.getElementById("displayPower")
+
+    commonX = chart.data.datasets[2].data[len = chart.data.datasets[2].data.length - 1].x
+
+    alpha = jStat.ztest(commonX, curve1.mean, curve1.stdev, 1).toFixed(2)
+    beta = jStat.ztest(commonX, curve2.mean, curve2.stdev, 1).toFixed(2)
+    power = (1 - beta).toFixed(2)
+
+    dAlpha.innerHTML = alpha
+
+    if (commonX <= curve2.mean) {
+        dBeta.innerHTML = beta
+        dPower.innerHTML = power
+    } else {
+        dBeta.innerHTML = power
+        dPower.innerHTML = beta
+    }
+}
 
 //create the initial alpha, beta, and power highlights and displays their initial values
 updateAlphaBetaPower(0.1)
