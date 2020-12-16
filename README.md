@@ -1,3 +1,3 @@
-# alpha-beta-visualization
+# alpha Beta Visualization
 
 Visualizes the relationship between alpha, beta, and power
